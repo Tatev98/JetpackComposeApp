@@ -25,9 +25,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.jetpackcomposeapp.R
 import com.example.jetpackcomposeapp.screens.indicator.DotsIndicator
-import com.example.jetpackcomposeapp.ui.theme.lightGray
-import com.example.jetpackcomposeapp.ui.theme.primaryCremea
-import com.example.jetpackcomposeapp.ui.theme.primaryGray
+import com.example.jetpackcomposeapp.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 
 
@@ -36,16 +34,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.LightGray)
-            .wrapContentSize(Alignment.Center)
-    ) {
-        Text(
-            text = "Home View"
-        )
-    }
     Surface(color = Color.White) {
         ConstraintLayout(
             modifier = Modifier.fillMaxSize(),
@@ -372,6 +360,9 @@ fun DoorsRuleItem(
     modifier: Modifier
 ) {
 
+    //for getting dialog opened state
+    val openDialog = remember { mutableStateOf(false) }
+
     //for getting button pressed state
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -383,10 +374,11 @@ fun DoorsRuleItem(
     val tint = if (isPressed || !enabled) Color.LightGray else Color.White
     val size = if (isPressed) 50.dp else 60.dp
     val icon = if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock
+    val text = if (isLocked) "lock" else "unlock"
     Button(
         onClick = {
             enabled = false
-            //TODO open dialog and change state
+            openDialog.value = true
         },
         interactionSource = interactionSource,
         modifier = modifier.size(size),
@@ -398,6 +390,41 @@ fun DoorsRuleItem(
             painter = painterResource(icon),
             contentDescription = "Lock",
             tint = tint
+        )
+    }
+    if (openDialog.value) {
+
+        AlertDialog(
+            onDismissRequest = {
+                openDialog.value = false
+            },
+            title = {
+                Text(text = "Are you sure?", color = Color.Black)
+            },
+            text = {
+                Text(
+                    "Please confirm that you want to $text the doors of \"Car name \"",
+                    color = Color.Black
+                )
+            },
+            confirmButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(backgroundColor = primaryBlue),
+                    onClick = {
+                        openDialog.value = false
+                    },
+                ) {
+                    Text("Yes, $text", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
+                    }) {
+                    Text("Cancel", color = primaryBlue)
+                }
+            }
         )
     }
 }
