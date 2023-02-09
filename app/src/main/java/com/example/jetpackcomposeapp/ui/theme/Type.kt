@@ -37,5 +37,20 @@ val Typography = Typography(
         fontFamily = raleway,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp
-    )
+    ),
+    h3 = TextStyle(
+        fontFamily = raleway,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 30.sp
+    ),
+    h4 = TextStyle(
+        fontFamily = raleway,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp
+    ),
+    h5 = TextStyle(
+        fontFamily = raleway,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp
+    ),
 )
