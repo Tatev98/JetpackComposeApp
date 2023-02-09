@@ -35,197 +35,228 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     Surface(color = Color.White) {
-        ConstraintLayout(
-            modifier = Modifier.fillMaxSize(),
+        val snackState = remember { SnackbarHostState() }
+        val coroutineScope = rememberCoroutineScope()
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
-            val (
-                carData, divider1, divider2, updatedDate, carImage, pagerIndicator,
-                carOptions, carEngine
-            ) = createRefs()
-            val guildLineFromTop1 = createGuidelineFromTop(0.162f)
-            val guildLineFromTop2 = createGuidelineFromTop(0.34f)
-            val guildLineFromTop3 = createGuidelineFromTop(0.48f)
-            val guildLineFromTop4 = createGuidelineFromTop(0.1952f)
-            val guildLineFromTop5 = createGuidelineFromTop(0.5552f)
-            val guildLineFromTop6 = createGuidelineFromTop(0.74f)
-            val guildLineFromStart1 = createGuidelineFromStart(0.05f)
-            val guildLineFromStart2 = createGuidelineFromStart(0.48f)
-            val guildLineFromStart3 = createGuidelineFromStart(0.52f)
-            val guildLineFromStart4 = createGuidelineFromStart(0.95f)
-            Row(horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .constrainAs(carData) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(guildLineFromTop1)
-                        height = Dimension.fillToConstraints
-                    }
+            ConstraintLayout(
+                modifier = Modifier.fillMaxSize(),
             ) {
-                Text(
-                    text = "Name",
-                    style = MaterialTheme.typography.h1.merge(),
-                    color = Color.Black,
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .weight(5f)
-                        .padding(end = 10.dp),
-                    textAlign = TextAlign.End,
-                )
-                Divider(
-                    color = primaryCremea,
-                    modifier = Modifier
-                        .height(28.dp)
-                        .align(Alignment.CenterVertically)
-                        .width(3.dp)
-                )
-                Row(
-                    horizontalArrangement = Arrangement.Start,
+                val (
+                    carData, divider1, divider2, updatedDate, carImage, pagerIndicator,
+                    carOptions, carEngine
+                ) = createRefs()
+                val guildLineFromTop1 = createGuidelineFromTop(0.162f)
+                val guildLineFromTop2 = createGuidelineFromTop(0.34f)
+                val guildLineFromTop3 = createGuidelineFromTop(0.48f)
+                val guildLineFromTop4 = createGuidelineFromTop(0.1952f)
+                val guildLineFromTop5 = createGuidelineFromTop(0.5552f)
+                val guildLineFromTop6 = createGuidelineFromTop(0.74f)
+                val guildLineFromStart1 = createGuidelineFromStart(0.05f)
+                val guildLineFromStart2 = createGuidelineFromStart(0.48f)
+                val guildLineFromStart3 = createGuidelineFromStart(0.52f)
+                val guildLineFromStart4 = createGuidelineFromStart(0.95f)
+                Row(horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(5f)
-                        .align(Alignment.CenterVertically)
-                        .padding(start = 10.dp)
+                        .constrainAs(carData) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(guildLineFromTop1)
+                            height = Dimension.fillToConstraints
+                        }
+                ) {
+                    Text(
+                        text = "Name",
+                        style = MaterialTheme.typography.h1.merge(),
+                        color = Color.Black,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .weight(5f)
+                            .padding(end = 10.dp),
+                        textAlign = TextAlign.End,
+                    )
+                    Divider(
+                        color = primaryCremea,
+                        modifier = Modifier
+                            .height(28.dp)
+                            .align(Alignment.CenterVertically)
+                            .width(3.dp)
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(5f)
+                            .align(Alignment.CenterVertically)
+                            .padding(start = 10.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_gas_station),
+                            contentDescription = "Gas Station",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                        )
+                        Text(
+                            text = "120mi",
+                            style = MaterialTheme.typography.h2.merge(),
+                            color = Color.Black,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(start = 5.dp),
+                            textAlign = TextAlign.Start,
+                        )
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.LightGray, Color.White),
+                                startY = 6f
+                            )
+                        )
+                        .constrainAs(divider1) {
+                            top.linkTo(guildLineFromTop1)
+                            bottom.linkTo(guildLineFromTop2)
+                            height = Dimension.fillToConstraints
+                        })
+
+                {
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(primaryGray, Color.White),
+                                startY = 8.0f
+                            )
+                        )
+                        .constrainAs(divider2) {
+                            top.linkTo(guildLineFromTop2)
+                            bottom.linkTo(parent.bottom)
+                            height = Dimension.fillToConstraints
+                        })
+
+                {
+                }
+                Image(
+                    painterResource(R.drawable.photo_car),
+                    contentDescription = "Car Photo",
+                    modifier = Modifier.constrainAs(carImage) {
+                        top.linkTo(guildLineFromTop2)
+                        bottom.linkTo(guildLineFromTop2)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.wrapContent
+                        width = Dimension.wrapContent
+                    }
+                )
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .constrainAs(pagerIndicator) {
+                            top.linkTo(guildLineFromTop3)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            height = Dimension.wrapContent
+                            width = Dimension.wrapContent
+                        }
+                ) {
+                    DotsIndicator(
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        totalDots = 3,
+                        selectedIndex = 0
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add icon",
+                        tint = Color.LightGray,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                    )
+                }
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .constrainAs(updatedDate) {
+                            top.linkTo(guildLineFromTop4)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            height = Dimension.wrapContent
+                            width = Dimension.wrapContent
+                        }
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_gas_station),
-                        contentDescription = "Gas Station",
-                        tint = Color.Black,
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        tint = primaryCremea,
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                     )
                     Text(
-                        text = "120mi",
-                        style = MaterialTheme.typography.h2.merge(),
-                        color = Color.Black,
+                        text = "Updated 1 min ago",
+                        style = MaterialTheme.typography.h5.merge(),
+                        color = Color.DarkGray,
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                             .padding(start = 5.dp),
                         textAlign = TextAlign.Start,
                     )
                 }
+                CarRuleContainer(
+                    modifier = Modifier
+                        .constrainAs(carOptions) {
+                            top.linkTo(guildLineFromTop5)
+                            bottom.linkTo(guildLineFromTop6)
+                            start.linkTo(guildLineFromStart1)
+                            end.linkTo(guildLineFromStart2)
+                            height = Dimension.fillToConstraints
+                            width = Dimension.fillToConstraints
+                        }, RuleType.DOORS, true
+                )
+                CarRuleContainer(
+                    modifier = Modifier
+                        .constrainAs(carEngine) {
+                            top.linkTo(guildLineFromTop5)
+                            bottom.linkTo(guildLineFromTop6)
+                            start.linkTo(guildLineFromStart3)
+                            end.linkTo(guildLineFromStart4)
+                            height = Dimension.fillToConstraints
+                            width = Dimension.fillToConstraints
+                        }, RuleType.ENGINE
+                )
             }
-            Box(
+            SnackbarHost(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color.LightGray, Color.White),
-                            startY = 6f
+                    .align(Alignment.BottomCenter)
+                    .padding(10.dp),
+                hostState = snackState
+            ) {
+                Snackbar(
+                    backgroundColor = Color.DarkGray,
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.DarkGray),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Doors Unlocked", color = Color.White)
+                        Icon(
+                            painterResource(id = R.drawable.ic_check_circle),
+                            contentDescription = null,
+                            tint = Color.Green
                         )
-                    )
-                    .constrainAs(divider1) {
-                        top.linkTo(guildLineFromTop1)
-                        bottom.linkTo(guildLineFromTop2)
-                        height = Dimension.fillToConstraints
-                    })
-
-            {
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(primaryGray, Color.White),
-                            startY = 8.0f
-                        )
-                    )
-                    .constrainAs(divider2) {
-                        top.linkTo(guildLineFromTop2)
-                        bottom.linkTo(parent.bottom)
-                        height = Dimension.fillToConstraints
-                    })
-
-            {
-            }
-            Image(
-                painterResource(R.drawable.photo_car),
-                contentDescription = "Car Photo",
-                modifier = Modifier.constrainAs(carImage) {
-                    top.linkTo(guildLineFromTop2)
-                    bottom.linkTo(guildLineFromTop2)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    height = Dimension.wrapContent
-                    width = Dimension.wrapContent
+                    }
                 }
-            )
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .constrainAs(pagerIndicator) {
-                        top.linkTo(guildLineFromTop3)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        height = Dimension.wrapContent
-                        width = Dimension.wrapContent
-                    }
-            ) {
-                DotsIndicator(
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                    totalDots = 3,
-                    selectedIndex = 0
-                )
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add icon",
-                    tint = Color.LightGray,
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                )
             }
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .constrainAs(updatedDate) {
-                        top.linkTo(guildLineFromTop4)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        height = Dimension.wrapContent
-                        width = Dimension.wrapContent
-                    }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Refresh",
-                    tint = primaryCremea,
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                )
-                Text(
-                    text = "Updated 1 min ago",
-                    style = MaterialTheme.typography.h5.merge(),
-                    color = Color.DarkGray,
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(start = 5.dp),
-                    textAlign = TextAlign.Start,
-                )
-            }
-            CarRuleContainer(
-                modifier = Modifier
-                    .constrainAs(carOptions) {
-                        top.linkTo(guildLineFromTop5)
-                        bottom.linkTo(guildLineFromTop6)
-                        start.linkTo(guildLineFromStart1)
-                        end.linkTo(guildLineFromStart2)
-                        height = Dimension.fillToConstraints
-                        width = Dimension.fillToConstraints
-                    }, RuleType.DOORS, true
-            )
-            CarRuleContainer(
-                modifier = Modifier
-                    .constrainAs(carEngine) {
-                        top.linkTo(guildLineFromTop5)
-                        bottom.linkTo(guildLineFromTop6)
-                        start.linkTo(guildLineFromStart3)
-                        end.linkTo(guildLineFromStart4)
-                        height = Dimension.fillToConstraints
-                        width = Dimension.fillToConstraints
-                    }, RuleType.ENGINE
-            )
         }
-
     }
 }
 
