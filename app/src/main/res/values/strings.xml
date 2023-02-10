@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">JetpackComposeApp</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="please_confirm_that_you_want_to_change_doors_state">Please confirm that you want to %s the doors of %s </string>
+    <string name="yes_confirm">Yes, %s</string>
+    <string name="cancel">Cancel</string>
+    <string name="lock">Lock</string>
+    <string name="lock_in_text">lock</string>
+    <string name="unlock_in_text">unlock</string>
+    <string name="unlock">Unlock</string>
+    <string name="unlocked">Unlocked</string>
+    <string name="doors_unlocked">Doors Unlocked</string>
+    <string name="doors_locked">Doors Locked</string>
+    <string name="locked">Locked</string>
+    <string name="dots">…</string>
+    <string name="doors">Doors</string>
+    <string name="engine">Engine</string>
+    <string name="start">START</string>
+    <string name="stop">STOP</string>
 </resources>
