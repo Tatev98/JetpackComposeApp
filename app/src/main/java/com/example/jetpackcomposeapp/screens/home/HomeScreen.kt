@@ -2,30 +2,36 @@ package com.example.jetpackcomposeapp.screens.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.jetpackcomposeapp.R
+import com.example.jetpackcomposeapp.events.DoorsStateEvent
+import com.example.jetpackcomposeapp.events.UIEvent
+import com.example.jetpackcomposeapp.screens.carruleitems.DoorsRuleContainer
+import com.example.jetpackcomposeapp.screens.carruleitems.EngineRuleContainer
+import com.example.jetpackcomposeapp.screens.dialogs.DefaultAlert
+import com.example.jetpackcomposeapp.screens.dialogs.DefaultSnackbar
 import com.example.jetpackcomposeapp.screens.indicator.DotsIndicator
-import com.example.jetpackcomposeapp.ui.theme.*
+import com.example.jetpackcomposeapp.ui.theme.primaryCremea
+import com.example.jetpackcomposeapp.ui.theme.primaryGray
 import com.ramcosta.composedestinations.annotation.Destination
 
 
@@ -34,20 +40,50 @@ import com.ramcosta.composedestinations.annotation.Destination
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val state = viewModel.uiState.value
     Surface(color = Color.White) {
         val snackState = remember { SnackbarHostState() }
-        val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
         Box(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
+            //collecting doors state changes and showing snackbar with corresponding msg
+            LaunchedEffect(key1 = context) {
+                viewModel.doorsStateChangeEvent.collect { event ->
+                    val message =
+                        if (event is DoorsStateEvent.Locked) context.resources.getString(R.string.doors_locked) else
+                            context.resources.getString(R.string.doors_unlocked)
+                    snackState.showSnackbar(message)
+                }
+            }
+            // showing alert dialog if need
+            if (state.isShowingDialog) {
+                //set needed text to dialog depends on doors' state
+                val text =
+                    if (state.isClickedLock) stringResource(R.string.lock_in_text) else stringResource(
+                        R.string.unlock_in_text
+                    )
+                val buttonText =
+                    if (state.isClickedLock) stringResource(R.string.lock) else stringResource(R.string.unlock)
+                DefaultAlert(
+                    title = stringResource(R.string.are_you_sure),
+                    text = stringResource(
+                        R.string.please_confirm_that_you_want_to_change_doors_state,
+                        text, "carName"
+                    ),
+                    confirmBtnText = stringResource(id = R.string.yes_confirm, buttonText),
+                    cancelBtnText = stringResource(id = R.string.cancel),
+                    onDismiss = {
+                        viewModel.onEvent(UIEvent.OpenDialogStateChanged(false))
+                        if (it)
+                            viewModel.onEvent(UIEvent.OnDoorsStateChanged(state.isClickedLock))
+                    }
+                )
+            }
             ConstraintLayout(
                 modifier = Modifier.fillMaxSize(),
             ) {
-                val (
-                    carData, divider1, divider2, updatedDate, carImage, pagerIndicator,
-                    carOptions, carEngine
-                ) = createRefs()
+                val (carData, divider1, divider2, updatedDate, carImage, pagerIndicator, carOptions, carEngine) = createRefs()
                 val guildLineFromTop1 = createGuidelineFromTop(0.162f)
                 val guildLineFromTop2 = createGuidelineFromTop(0.34f)
                 val guildLineFromTop3 = createGuidelineFromTop(0.48f)
@@ -58,6 +94,8 @@ fun HomeScreen(
                 val guildLineFromStart2 = createGuidelineFromStart(0.48f)
                 val guildLineFromStart3 = createGuidelineFromStart(0.52f)
                 val guildLineFromStart4 = createGuidelineFromStart(0.95f)
+
+                //Row for Car name and miles data
                 Row(horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -65,8 +103,7 @@ fun HomeScreen(
                             top.linkTo(parent.top)
                             bottom.linkTo(guildLineFromTop1)
                             height = Dimension.fillToConstraints
-                        }
-                ) {
+                        }) {
                     Text(
                         text = "Name",
                         style = MaterialTheme.typography.h1.merge(),
@@ -96,8 +133,7 @@ fun HomeScreen(
                             painter = painterResource(R.drawable.ic_gas_station),
                             contentDescription = "Gas Station",
                             tint = Color.Black,
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
+                            modifier = Modifier.align(Alignment.CenterVertically)
                         )
                         Text(
                             text = "120mi",
@@ -110,42 +146,40 @@ fun HomeScreen(
                         )
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(Color.LightGray, Color.White),
-                                startY = 6f
-                            )
-                        )
-                        .constrainAs(divider1) {
-                            top.linkTo(guildLineFromTop1)
-                            bottom.linkTo(guildLineFromTop2)
-                            height = Dimension.fillToConstraints
-                        })
 
-                {
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(primaryGray, Color.White),
-                                startY = 8.0f
-                            )
+                //Box for first gradient background
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color.LightGray, Color.White), startY = 6f
                         )
-                        .constrainAs(divider2) {
-                            top.linkTo(guildLineFromTop2)
-                            bottom.linkTo(parent.bottom)
-                            height = Dimension.fillToConstraints
-                        })
+                    )
+                    .constrainAs(divider1) {
+                        top.linkTo(guildLineFromTop1)
+                        bottom.linkTo(guildLineFromTop2)
+                        height = Dimension.fillToConstraints
+                    })
 
-                {
-                }
-                Image(
-                    painterResource(R.drawable.photo_car),
+                {}
+
+                //Box for second gradient background
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(primaryGray, Color.White), startY = 8.0f
+                        )
+                    )
+                    .constrainAs(divider2) {
+                        top.linkTo(guildLineFromTop2)
+                        bottom.linkTo(parent.bottom)
+                        height = Dimension.fillToConstraints
+                    })
+
+                {}
+                //Image for car photo
+                Image(painterResource(R.drawable.photo_car),
                     contentDescription = "Car Photo",
                     modifier = Modifier.constrainAs(carImage) {
                         top.linkTo(guildLineFromTop2)
@@ -154,19 +188,16 @@ fun HomeScreen(
                         end.linkTo(parent.end)
                         height = Dimension.wrapContent
                         width = Dimension.wrapContent
-                    }
-                )
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .constrainAs(pagerIndicator) {
-                            top.linkTo(guildLineFromTop3)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            height = Dimension.wrapContent
-                            width = Dimension.wrapContent
-                        }
-                ) {
+                    })
+                //Row for pager indicator
+                Row(horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.constrainAs(pagerIndicator) {
+                        top.linkTo(guildLineFromTop3)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.wrapContent
+                        width = Dimension.wrapContent
+                    }) {
                     DotsIndicator(
                         modifier = Modifier.align(Alignment.CenterVertically),
                         totalDots = 3,
@@ -176,27 +207,24 @@ fun HomeScreen(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add icon",
                         tint = Color.LightGray,
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
+                        modifier = Modifier.align(Alignment.CenterVertically)
                     )
                 }
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .constrainAs(updatedDate) {
-                            top.linkTo(guildLineFromTop4)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            height = Dimension.wrapContent
-                            width = Dimension.wrapContent
-                        }
-                ) {
+
+                //Row for refresh data
+                Row(horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.constrainAs(updatedDate) {
+                        top.linkTo(guildLineFromTop4)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.wrapContent
+                        width = Dimension.wrapContent
+                    }) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = "Refresh",
                         tint = primaryCremea,
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
+                        modifier = Modifier.align(Alignment.CenterVertically)
                     )
                     Text(
                         text = "Updated 1 min ago",
@@ -208,292 +236,51 @@ fun HomeScreen(
                         textAlign = TextAlign.Start,
                     )
                 }
-                CarRuleContainer(
-                    modifier = Modifier
-                        .constrainAs(carOptions) {
-                            top.linkTo(guildLineFromTop5)
-                            bottom.linkTo(guildLineFromTop6)
-                            start.linkTo(guildLineFromStart1)
-                            end.linkTo(guildLineFromStart2)
-                            height = Dimension.fillToConstraints
-                            width = Dimension.fillToConstraints
-                        }, RuleType.DOORS, true
+
+                //Container for doors state changing buttons
+                DoorsRuleContainer(
+                    modifier = Modifier.constrainAs(carOptions) {
+                        top.linkTo(guildLineFromTop5)
+                        bottom.linkTo(guildLineFromTop6)
+                        start.linkTo(guildLineFromStart1)
+                        end.linkTo(guildLineFromStart2)
+                        height = Dimension.fillToConstraints
+                        width = Dimension.fillToConstraints
+                    },
+                    isClickedLock = state.isClickedLock,
+                    isLoading = state.isShowingLoading,
+                    isDoorsLocked = state.isDoorsLocked,
+                    onClick = {
+                        viewModel.onEvent(UIEvent.OpenDialogStateChanged(true))
+                        viewModel.onEvent(UIEvent.OnAskForDoorsStateChanged(it))
+                    },
                 )
-                CarRuleContainer(
-                    modifier = Modifier
-                        .constrainAs(carEngine) {
-                            top.linkTo(guildLineFromTop5)
-                            bottom.linkTo(guildLineFromTop6)
-                            start.linkTo(guildLineFromStart3)
-                            end.linkTo(guildLineFromStart4)
-                            height = Dimension.fillToConstraints
-                            width = Dimension.fillToConstraints
-                        }, RuleType.ENGINE
-                )
+
+
+                //Container for engine state changing buttons
+                EngineRuleContainer(modifier = Modifier.constrainAs(carEngine) {
+                    top.linkTo(guildLineFromTop5)
+                    bottom.linkTo(guildLineFromTop6)
+                    start.linkTo(guildLineFromStart3)
+                    end.linkTo(guildLineFromStart4)
+                    height = Dimension.fillToConstraints
+                    width = Dimension.fillToConstraints
+                })
             }
-            SnackbarHost(
+
+
+            DefaultSnackbar(
+                snackbarHostState = snackState,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(10.dp),
-                hostState = snackState
-            ) {
-                Snackbar(
-                    backgroundColor = Color.DarkGray,
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.DarkGray),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Doors Unlocked", color = Color.White)
-                        Icon(
-                            painterResource(id = R.drawable.ic_check_circle),
-                            contentDescription = null,
-                            tint = Color.Green
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-enum class RuleType {
-    ENGINE, DOORS
-}
-
-
-//Container for Controlling items
-@Composable
-fun CarRuleContainer(modifier: Modifier, ruleType: RuleType, isLocked: Boolean = true) {
-    ConstraintLayout(
-        modifier = modifier
-    ) {
-        val (
-            titleRow, buttonsBackgroundBox, firstButton, secondButton
-        ) = createRefs()
-        val text = if (ruleType == RuleType.DOORS) "Doors" else "Engine"
-        val guildLineFromStart1 = createGuidelineFromStart(0.08f)
-        val guildLineFromStart2 = createGuidelineFromStart(0.495f)
-        val guildLineFromStart3 = createGuidelineFromStart(0.505f)
-        val guildLineFromStart4 = createGuidelineFromStart(0.92f)
-        Row(
-            modifier = Modifier
-                .constrainAs(titleRow) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    width = Dimension.wrapContent
-                    height = Dimension.wrapContent
-                }
-                .padding(bottom = 5.dp)
-        ) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.h4.merge(),
-                color = Color.Black,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(end = 10.dp),
-                textAlign = TextAlign.Start,
-            )
-            if (ruleType == RuleType.DOORS) {
-                Divider(
-                    color = Color.LightGray,
-                    modifier = Modifier
-                        .height(20.dp)
-                        .align(Alignment.CenterVertically)
-                        .width(2.dp)
-                )
-                Text(
-                    text = "Locked",
-                    style = MaterialTheme.typography.h5.merge(),
-                    color = lightGray,
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(start = 10.dp),
-                    textAlign = TextAlign.Start,
-                )
-            }
-        }
-        Box(
-            modifier = Modifier
-                .constrainAs(buttonsBackgroundBox) {
-                    top.linkTo(titleRow.bottom)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                    height = Dimension.fillToConstraints
-                }
-                .background(Color.White, RectangleShape)) {}
-        if (ruleType == RuleType.DOORS) {
-            DoorsRuleItem(
-                isLocked = isLocked,
-                modifier = Modifier
-                    .constrainAs(firstButton) {
-                        top.linkTo(titleRow.bottom)
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(guildLineFromStart1)
-                        end.linkTo(guildLineFromStart2)
-                        width = Dimension.wrapContent
-                        height = Dimension.wrapContent
-                    }
-            )
-            DoorsRuleItem(
-                isLocked = !isLocked,
-                modifier = Modifier
-                    .constrainAs(secondButton) {
-                        top.linkTo(titleRow.bottom)
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(guildLineFromStart3)
-                        end.linkTo(guildLineFromStart4)
-                        width = Dimension.wrapContent
-                        height = Dimension.wrapContent
-                    }
-            )
-        } else {
-            EngineRuleItem(
-                "START",
-                modifier = Modifier
-                    .constrainAs(firstButton) {
-                        top.linkTo(titleRow.bottom)
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(guildLineFromStart1)
-                        end.linkTo(guildLineFromStart2)
-                        width = Dimension.wrapContent
-                        height = Dimension.wrapContent
-                    }
-            )
-            EngineRuleItem(
-                "STOP",
-                modifier = Modifier
-                    .constrainAs(secondButton) {
-                        top.linkTo(titleRow.bottom)
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(guildLineFromStart3)
-                        end.linkTo(guildLineFromStart4)
-                        width = Dimension.wrapContent
-                        height = Dimension.wrapContent
-                    }
+                showIcon = true,
+                icon = R.drawable.ic_check_circle
             )
         }
     }
 }
 
 
-//Item for controlling doors state
-@Composable
-fun DoorsRuleItem(
-    isLocked: Boolean,
-    modifier: Modifier
-) {
-
-    //for getting dialog opened state
-    val openDialog = remember { mutableStateOf(false) }
-
-    //for getting button pressed state
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    var enabled by rememberSaveable { mutableStateOf(true) }
-
-    //change button appearance depends on pressed state
-    val color =
-        if (isPressed || !enabled) Color.DarkGray else if (isLocked) primaryCremea else Color.Black
-    val tint = if (isPressed || !enabled) Color.LightGray else Color.White
-    val size = if (isPressed) 50.dp else 60.dp
-    val icon = if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock
-    val text = if (isLocked) "lock" else "unlock"
-    Button(
-        onClick = {
-            enabled = false
-            openDialog.value = true
-        },
-        interactionSource = interactionSource,
-        modifier = modifier.size(size),
-        shape = CircleShape,
-        contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(contentColor = tint, backgroundColor = color)
-    ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = "Lock",
-            tint = tint
-        )
-    }
-    if (openDialog.value) {
-
-        AlertDialog(
-            onDismissRequest = {
-                openDialog.value = false
-            },
-            title = {
-                Text(text = "Are you sure?", color = Color.Black)
-            },
-            text = {
-                Text(
-                    "Please confirm that you want to $text the doors of \"Car name \"",
-                    color = Color.Black
-                )
-            },
-            confirmButton = {
-                Button(
-                    colors = ButtonDefaults.buttonColors(backgroundColor = primaryBlue),
-                    onClick = {
-                        openDialog.value = false
-                    },
-                ) {
-                    Text("Yes, $text", color = Color.White)
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        openDialog.value = false
-                    }) {
-                    Text("Cancel", color = primaryBlue)
-                }
-            }
-        )
-    }
-}
-
-
-//Item for controlling engine state
-@Composable
-fun EngineRuleItem(
-    text: String, modifier: Modifier
-) {
-
-    //for getting button pressed state
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-
-    //change button appearance depends on pressed state
-    val color = if (isPressed) Color.DarkGray else Color.Black
-    val textColor = if (isPressed) Color.LightGray else Color.White
-    val size = if (isPressed) 50.dp else 60.dp
-
-    Button(
-        onClick = {},
-        interactionSource = interactionSource,
-        modifier = modifier.size(size),
-        shape = CircleShape,
-        contentPadding = PaddingValues(2.dp),
-        colors = ButtonDefaults.buttonColors(contentColor = textColor, backgroundColor = color)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.h5.merge(),
-            color = textColor,
-            modifier = Modifier
-                .align(Alignment.CenterVertically),
-            textAlign = TextAlign.Center,
-        )
-    }
-}
 
 
