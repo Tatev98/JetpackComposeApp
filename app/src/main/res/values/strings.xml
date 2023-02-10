@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">JetpackComposeApp</string>
     <string name="are_you_sure">Are you sure?</string>
-    <string name="please_confirm_that_you_want_to_change_doors_state">Please confirm that you want to %s the doors of %s </string>
+    <string name="please_confirm_that_you_want_to_change_doors_state">Please confirm that you want to %s the doors of \"%s\" </string>
     <string name="yes_confirm">Yes, %s</string>
     <string name="cancel">Cancel</string>
     <string name="lock">Lock</string>
@@ -17,4 +17,6 @@
     <string name="engine">Engine</string>
     <string name="start">START</string>
     <string name="stop">STOP</string>
+    <string name="my_car_name">My %s</string>
+    <string name="miles">%smi</string>
 </resources>

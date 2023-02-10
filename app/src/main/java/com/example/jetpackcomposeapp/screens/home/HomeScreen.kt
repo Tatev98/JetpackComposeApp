@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.jetpackcomposeapp.R
 import com.example.jetpackcomposeapp.events.DoorsStateEvent
 import com.example.jetpackcomposeapp.events.UIEvent
@@ -35,12 +38,17 @@ import com.example.jetpackcomposeapp.ui.theme.primaryGray
 import com.ramcosta.composedestinations.annotation.Destination
 
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Destination
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+
     val state = viewModel.uiState.value
+    val carName: String by viewModel.carName.collectAsStateWithLifecycle()
+    val carMiles: Int by viewModel.carMiles.collectAsStateWithLifecycle()
+    val carDoorsState: Boolean by viewModel.carDoorsLocked.collectAsStateWithLifecycle()
     Surface(color = Color.White) {
         val snackState = remember { SnackbarHostState() }
         val context = LocalContext.current
@@ -69,7 +77,7 @@ fun HomeScreen(
                     title = stringResource(R.string.are_you_sure),
                     text = stringResource(
                         R.string.please_confirm_that_you_want_to_change_doors_state,
-                        text, "carName"
+                        text, carName
                     ),
                     confirmBtnText = stringResource(id = R.string.yes_confirm, buttonText),
                     cancelBtnText = stringResource(id = R.string.cancel),
@@ -105,7 +113,7 @@ fun HomeScreen(
                             height = Dimension.fillToConstraints
                         }) {
                     Text(
-                        text = "Name",
+                        text = stringResource(id = R.string.my_car_name, carName),
                         style = MaterialTheme.typography.h1.merge(),
                         color = Color.Black,
                         modifier = Modifier
@@ -136,7 +144,7 @@ fun HomeScreen(
                             modifier = Modifier.align(Alignment.CenterVertically)
                         )
                         Text(
-                            text = "120mi",
+                            text = stringResource(id = R.string.miles, carMiles),
                             style = MaterialTheme.typography.h2.merge(),
                             color = Color.Black,
                             modifier = Modifier
@@ -249,7 +257,7 @@ fun HomeScreen(
                     },
                     isClickedLock = state.isClickedLock,
                     isLoading = state.isShowingLoading,
-                    isDoorsLocked = state.isDoorsLocked,
+                    isDoorsLocked = carDoorsState,
                     onClick = {
                         viewModel.onEvent(UIEvent.OpenDialogStateChanged(true))
                         viewModel.onEvent(UIEvent.OnAskForDoorsStateChanged(it))
@@ -280,7 +288,3 @@ fun HomeScreen(
         }
     }
 }
-
-
-
-
