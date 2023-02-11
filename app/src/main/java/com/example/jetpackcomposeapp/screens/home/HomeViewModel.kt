@@ -9,6 +9,7 @@ import com.example.jetpackcomposeapp.events.DoorsStateEvent
 import com.example.jetpackcomposeapp.events.UIEvent
 import com.example.jetpackcomposeapp.events.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,6 +23,48 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     val uiState: State<UIState> = _uiState
 
     val doorsStateChangeEvent = MutableSharedFlow<DoorsStateEvent>()
+
+    private var timerJob: Job? = null
+
+
+    //get car name from repository and create stateflow
+    val carName: StateFlow<String> = homeRepository.carName().filter {
+        it.isNotEmpty()
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(), "QX55"
+    )
+
+    //set new car name
+    private fun setCarName(name: String) {
+        viewModelScope.launch {
+            homeRepository.setCarName(name)
+        }
+    }
+
+    //get car miles from repository and create stateflow
+    val carMiles: StateFlow<Int> = homeRepository.carMiles().stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(), 120
+    )
+
+    //set  car miles
+    private fun setCarMiles(miles: Int) {
+        viewModelScope.launch {
+            homeRepository.setCarMiles(miles)
+        }
+    }
+
+    //get car doors' state from repository and create stateflow
+    val carDoorsLocked: StateFlow<Boolean> = homeRepository.carDoorsState().stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(), true
+    )
+
+    //change car doors' state
+    private fun setCarDoorsLocked(locked: Boolean) {
+        viewModelScope.launch {
+            homeRepository.setCarDoorsState(locked)
+        }
+    }
+
 
     //controlling state changes using events
     fun onEvent(event: UIEvent) {
@@ -39,6 +82,25 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
                     isClickedLock = event.locking
                 )
             }
+            is UIEvent.OnRefreshedPage -> {
+                startToCountUpdatedDate()
+            }
+        }
+    }
+
+
+    //count time for updating UI
+    private fun startToCountUpdatedDate() {
+        cancelJob()
+        var ticks = 0L
+        timerJob = viewModelScope.launch {
+            while (true) {
+                _uiState.value = _uiState.value.copy(
+                    updatedDate = ticks
+                )
+                delay(1000L)
+                ticks++
+            }
         }
     }
 
@@ -54,7 +116,6 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
             _uiState.value = _uiState.value.copy(
                 isShowingLoading = false
             )
-
             //set doors corresponding state to local datastore
             setCarDoorsLocked(isLocked)
 
@@ -68,53 +129,14 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     }
 
 
-    //get car name from repository and create stateflow
-    val carName: StateFlow<String> = homeRepository.carName().filter {
-        it.isNotEmpty()
-    }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            "QX55"
-        )
-
-    //set new car name
-    private fun setCarName(name: String) {
-        viewModelScope.launch {
-            homeRepository.setCarName(name)
-        }
+    //cancel current job
+    private fun cancelJob() {
+        timerJob?.cancel()
     }
 
-
-    //get car miles from repository and create stateflow
-    val carMiles: StateFlow<Int> = homeRepository.carMiles()
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            120
-        )
-
-    //set  car miles
-    private fun setCarMiles(miles: Int) {
-        viewModelScope.launch {
-            homeRepository.setCarMiles(miles)
-        }
-    }
-
-    //get car doors' state from repository and create stateflow
-    val carDoorsLocked: StateFlow<Boolean> = homeRepository.carDoorsState()
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            true
-        )
-
-
-    //change car doors' state
-    private fun setCarDoorsLocked(locked: Boolean) {
-        viewModelScope.launch {
-            homeRepository.setCarDoorsState(locked)
-        }
+    override fun onCleared() {
+        super.onCleared()
+        timerJob?.cancel()
     }
 
     companion object {

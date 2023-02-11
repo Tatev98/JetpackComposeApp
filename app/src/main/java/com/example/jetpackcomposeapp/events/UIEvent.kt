@@ -11,4 +11,5 @@ sealed class UIEvent {
 
     data class OnAskForDoorsStateChanged(val locking: Boolean) :
         UIEvent() // Call when asks for  doors' locking state change
+    object OnRefreshedPage : UIEvent() // Call when refreshing home page
 }

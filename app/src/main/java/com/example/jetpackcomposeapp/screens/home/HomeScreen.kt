@@ -2,15 +2,13 @@ package com.example.jetpackcomposeapp.screens.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -35,6 +33,7 @@ import com.example.jetpackcomposeapp.screens.dialogs.DefaultSnackbar
 import com.example.jetpackcomposeapp.screens.indicator.DotsIndicator
 import com.example.jetpackcomposeapp.ui.theme.primaryCremea
 import com.example.jetpackcomposeapp.ui.theme.primaryGray
+import com.example.jetpackcomposeapp.util.DateUtil
 import com.ramcosta.composedestinations.annotation.Destination
 
 
@@ -49,6 +48,22 @@ fun HomeScreen(
     val carName: String by viewModel.carName.collectAsStateWithLifecycle()
     val carMiles: Int by viewModel.carMiles.collectAsStateWithLifecycle()
     val carDoorsState: Boolean by viewModel.carDoorsLocked.collectAsStateWithLifecycle()
+
+    //start to counting update time once
+    LaunchedEffect(false) {
+        viewModel.onEvent(UIEvent.OnRefreshedPage)
+    }
+
+    //tried to create timer here
+/*
+    var ticks by remember { mutableStateOf(0L) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1000L)
+            ticks++
+        }
+    }*/
+
     Surface(color = Color.White) {
         val snackState = remember { SnackbarHostState() }
         val context = LocalContext.current
@@ -220,8 +235,11 @@ fun HomeScreen(
                 }
 
                 //Row for refresh data
-                Row(horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.constrainAs(updatedDate) {
+                Row(horizontalArrangement = Arrangement.Center, modifier = Modifier
+                    .clickable {
+                        viewModel.onEvent(UIEvent.OnRefreshedPage)
+                    }
+                    .constrainAs(updatedDate) {
                         top.linkTo(guildLineFromTop4)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
@@ -235,7 +253,7 @@ fun HomeScreen(
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )
                     Text(
-                        text = "Updated 1 min ago",
+                        text = DateUtil.getIntervalAgoSinceNow(state.updatedDate),
                         style = MaterialTheme.typography.h5.merge(),
                         color = Color.DarkGray,
                         modifier = Modifier
