@@ -18,10 +18,10 @@ object DateUtil {
                 return "just now"
             }
             interval < 2 * MINUTE -> {
-                return " 1 minute ago"
+                return " 1 min ago"
             }
             interval <= 45 * MINUTE -> {
-                return (interval / MINUTE).toString() + " minutes ago"
+                return (interval / MINUTE).toString() + " mins ago"
             }
             interval <= 90 * MINUTE -> {
                 return "1 hour ago"
