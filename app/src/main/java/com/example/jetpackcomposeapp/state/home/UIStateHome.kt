@@ -1,7 +1,7 @@
-package com.example.jetpackcomposeapp.events
+package com.example.jetpackcomposeapp.state.home
 
 //State to show needed state of view
-data class UIState(
+data class UIStateHome(
     val isDoorsLocked: Boolean = true, // doors' locked state (default are locked)
     val isShowingLoading: Boolean = false, // loading showing state
     val updatedDate: Long = 0L, // updated time

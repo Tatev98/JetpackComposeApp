@@ -1,4 +1,4 @@
-package com.example.jetpackcomposeapp.screens.dialogs
+package com.example.jetpackcomposeapp.components
 
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable

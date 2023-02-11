@@ -35,8 +35,8 @@ val Typography = Typography(
     ),
     h2 = TextStyle(
         fontFamily = raleway,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 22.sp
     ),
     h3 = TextStyle(
         fontFamily = raleway,

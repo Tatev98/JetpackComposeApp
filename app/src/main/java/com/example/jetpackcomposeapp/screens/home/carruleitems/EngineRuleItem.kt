@@ -1,4 +1,4 @@
-package com.example.jetpackcomposeapp.screens.carruleitems
+package com.example.jetpackcomposeapp.screens.home.carruleitems
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -33,7 +33,7 @@ fun EngineRuleItem(
     //change button appearance depends on pressed state
     val color = if (isPressed) Color.DarkGray else Color.Black
     val textColor = if (isPressed) Color.LightGray else Color.White
-    val size = if (isPressed) 50.dp else 60.dp
+    val size = if (isPressed) 55.dp else 60.dp
 
     Button(
         onClick = {},

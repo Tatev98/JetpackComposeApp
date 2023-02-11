@@ -1,4 +1,4 @@
-package com.example.jetpackcomposeapp.screens.dialogs
+package com.example.jetpackcomposeapp.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,8 +37,9 @@ fun DefaultSnackbar(
                     if (showIcon) {
                         Icon(
                             painterResource(id = icon),
-                            contentDescription = null,
-                            tint = Color.Green
+                            contentDescription = "icon",
+                            tint =Color.Unspecified
+
                         )
                     }
                 }

@@ -17,6 +17,6 @@
     <string name="engine">Engine</string>
     <string name="start">START</string>
     <string name="stop">STOP</string>
-    <string name="my_car_name">My %s</string>
     <string name="miles">%smi</string>
+    <string name="updated">Updated %s</string>
 </resources>

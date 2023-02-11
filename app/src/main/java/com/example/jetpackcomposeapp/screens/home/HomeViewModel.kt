@@ -4,10 +4,10 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.jetpackcomposeapp.data.local.HomeRepository
-import com.example.jetpackcomposeapp.events.DoorsStateEvent
-import com.example.jetpackcomposeapp.events.UIEvent
-import com.example.jetpackcomposeapp.events.UIState
+import com.example.jetpackcomposeapp.data.repo.home.HomeRepository
+import com.example.jetpackcomposeapp.events.home.DoorsStateEvent
+import com.example.jetpackcomposeapp.events.home.UIEventHome
+import com.example.jetpackcomposeapp.state.home.UIStateHome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -19,8 +19,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(private val homeRepository: HomeRepository) : ViewModel() {
 
 
-    private var _uiState = mutableStateOf(UIState())
-    val uiState: State<UIState> = _uiState
+    private var _uiState = mutableStateOf(UIStateHome())
+    val uiState: State<UIStateHome> = _uiState
 
     val doorsStateChangeEvent = MutableSharedFlow<DoorsStateEvent>()
 
@@ -31,7 +31,7 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
     val carName: StateFlow<String> = homeRepository.carName().filter {
         it.isNotEmpty()
     }.stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(), "QX55"
+        viewModelScope, SharingStarted.WhileSubscribed(), "My QX55"
     )
 
     //set new car name
@@ -67,22 +67,22 @@ class HomeViewModel @Inject constructor(private val homeRepository: HomeReposito
 
 
     //controlling state changes using events
-    fun onEvent(event: UIEvent) {
+    fun onEvent(event: UIEventHome) {
         when (event) {
-            is UIEvent.OnDoorsStateChanged -> {
+            is UIEventHome.OnDoorsStateChanged -> {
                 setDoorsStateChanged(event.locked)
             }
-            is UIEvent.OpenDialogStateChanged -> {
+            is UIEventHome.OpenDialogStateChanged -> {
                 _uiState.value = _uiState.value.copy(
                     isShowingDialog = event.showDialog
                 )
             }
-            is UIEvent.OnAskForDoorsStateChanged -> {
+            is UIEventHome.OnAskForDoorsStateChanged -> {
                 _uiState.value = _uiState.value.copy(
                     isClickedLock = event.locking
                 )
             }
-            is UIEvent.OnRefreshedPage -> {
+            is UIEventHome.OnRefreshedPage -> {
                 startToCountUpdatedDate()
             }
         }

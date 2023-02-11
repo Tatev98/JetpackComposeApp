@@ -1,4 +1,4 @@
-package com.example.jetpackcomposeapp
+package com.example.jetpackcomposeapp.screens
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import com.example.jetpackcomposeapp.model.navigation.Navigation
+import com.example.jetpackcomposeapp.navigation.Navigation
 import com.example.jetpackcomposeapp.screens.navigation.BottomNavigationBar
 import com.example.jetpackcomposeapp.ui.theme.JetpackComposeAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +37,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     //create bottomNavBar
-
     val navController = rememberNavController()
     Scaffold(
         modifier = Modifier.padding(bottom = 10.dp),

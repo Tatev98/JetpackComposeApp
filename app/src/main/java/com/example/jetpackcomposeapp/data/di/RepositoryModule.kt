@@ -1,8 +1,8 @@
 package com.example.jetpackcomposeapp.data.di
 
 
-import com.example.jetpackcomposeapp.data.local.HomeRepositoryImp
-import com.example.jetpackcomposeapp.data.local.HomeRepository
+import com.example.jetpackcomposeapp.data.repo.home.HomeRepositoryImp
+import com.example.jetpackcomposeapp.data.repo.home.HomeRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

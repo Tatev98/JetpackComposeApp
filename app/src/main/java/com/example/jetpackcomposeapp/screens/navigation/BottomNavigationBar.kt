@@ -13,7 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.jetpackcomposeapp.model.navigation.NavigationItem
+import com.example.jetpackcomposeapp.navigation.NavigationItem
 import com.example.jetpackcomposeapp.ui.theme.primaryCremea
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavController
@@ -52,6 +52,8 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
+
+//create navigation bar item
 @Composable
 fun AddItem(
     screen: NavigationItem, currentDestination: NavDestination?, navController: NavController

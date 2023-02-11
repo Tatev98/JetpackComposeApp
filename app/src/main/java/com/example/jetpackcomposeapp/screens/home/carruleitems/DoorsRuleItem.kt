@@ -1,4 +1,4 @@
-package com.example.jetpackcomposeapp.screens.carruleitems
+package com.example.jetpackcomposeapp.screens.home.carruleitems
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -40,7 +40,7 @@ fun DoorsRuleItem(
         if (isPressed || isEnabled) Color.DarkGray else if (isCurrentState) primaryCremea else Color.Black
 
     val tint = if (isPressed || isEnabled) Color.LightGray else Color.White
-    val size = if (isPressed && isClickable) 50.dp else 60.dp
+    val size = if (isPressed && isClickable) 55.dp else 60.dp
     val icon = if (isLockingButton) R.drawable.ic_lock else R.drawable.ic_unlock
 
     //if loading is showing add progress bar else add button

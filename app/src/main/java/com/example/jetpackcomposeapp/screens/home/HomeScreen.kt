@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,13 +23,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.jetpackcomposeapp.R
-import com.example.jetpackcomposeapp.events.DoorsStateEvent
-import com.example.jetpackcomposeapp.events.UIEvent
-import com.example.jetpackcomposeapp.screens.carruleitems.DoorsRuleContainer
-import com.example.jetpackcomposeapp.screens.carruleitems.EngineRuleContainer
-import com.example.jetpackcomposeapp.screens.dialogs.DefaultAlert
-import com.example.jetpackcomposeapp.screens.dialogs.DefaultSnackbar
-import com.example.jetpackcomposeapp.screens.indicator.DotsIndicator
+import com.example.jetpackcomposeapp.events.home.DoorsStateEvent
+import com.example.jetpackcomposeapp.events.home.UIEventHome
+import com.example.jetpackcomposeapp.screens.home.carruleitems.DoorsRuleContainer
+import com.example.jetpackcomposeapp.screens.home.carruleitems.EngineRuleContainer
+import com.example.jetpackcomposeapp.components.DefaultAlert
+import com.example.jetpackcomposeapp.components.DefaultSnackbar
+import com.example.jetpackcomposeapp.components.indicator.DotsIndicator
 import com.example.jetpackcomposeapp.ui.theme.primaryCremea
 import com.example.jetpackcomposeapp.ui.theme.primaryGray
 import com.example.jetpackcomposeapp.util.DateUtil
@@ -51,7 +50,7 @@ fun HomeScreen(
 
     //start to counting update time once
     LaunchedEffect(false) {
-        viewModel.onEvent(UIEvent.OnRefreshedPage)
+        viewModel.onEvent(UIEventHome.OnRefreshedPage)
     }
 
     //tried to create timer here
@@ -97,9 +96,9 @@ fun HomeScreen(
                     confirmBtnText = stringResource(id = R.string.yes_confirm, buttonText),
                     cancelBtnText = stringResource(id = R.string.cancel),
                     onDismiss = {
-                        viewModel.onEvent(UIEvent.OpenDialogStateChanged(false))
+                        viewModel.onEvent(UIEventHome.OpenDialogStateChanged(false))
                         if (it)
-                            viewModel.onEvent(UIEvent.OnDoorsStateChanged(state.isClickedLock))
+                            viewModel.onEvent(UIEventHome.OnDoorsStateChanged(state.isClickedLock))
                     }
                 )
             }
@@ -128,7 +127,7 @@ fun HomeScreen(
                             height = Dimension.fillToConstraints
                         }) {
                     Text(
-                        text = stringResource(id = R.string.my_car_name, carName),
+                        text =  carName,
                         style = MaterialTheme.typography.h1.merge(),
                         color = Color.Black,
                         modifier = Modifier
@@ -140,7 +139,7 @@ fun HomeScreen(
                     Divider(
                         color = primaryCremea,
                         modifier = Modifier
-                            .height(28.dp)
+                            .height(30.dp)
                             .align(Alignment.CenterVertically)
                             .width(3.dp)
                     )
@@ -163,8 +162,7 @@ fun HomeScreen(
                             style = MaterialTheme.typography.h2.merge(),
                             color = Color.Black,
                             modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(start = 5.dp),
+                                .align(Alignment.CenterVertically),
                             textAlign = TextAlign.Start,
                         )
                     }
@@ -237,7 +235,7 @@ fun HomeScreen(
                 //Row for refresh data
                 Row(horizontalArrangement = Arrangement.Center, modifier = Modifier
                     .clickable {
-                        viewModel.onEvent(UIEvent.OnRefreshedPage)
+                        viewModel.onEvent(UIEventHome.OnRefreshedPage)
                     }
                     .constrainAs(updatedDate) {
                         top.linkTo(guildLineFromTop4)
@@ -247,13 +245,13 @@ fun HomeScreen(
                         width = Dimension.wrapContent
                     }) {
                     Icon(
-                        imageVector = Icons.Default.Refresh,
+                        painter = painterResource(id = R.drawable.ic_refresh),
                         contentDescription = "Refresh",
                         tint = primaryCremea,
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )
                     Text(
-                        text = DateUtil.getIntervalAgoSinceNow(state.updatedDate),
+                        text = stringResource(id =R.string.updated, DateUtil.getIntervalAgoSinceNow(state.updatedDate)),
                         style = MaterialTheme.typography.h5.merge(),
                         color = Color.DarkGray,
                         modifier = Modifier
@@ -277,8 +275,8 @@ fun HomeScreen(
                     isLoading = state.isShowingLoading,
                     isDoorsLocked = carDoorsState,
                     onClick = {
-                        viewModel.onEvent(UIEvent.OpenDialogStateChanged(true))
-                        viewModel.onEvent(UIEvent.OnAskForDoorsStateChanged(it))
+                        viewModel.onEvent(UIEventHome.OpenDialogStateChanged(true))
+                        viewModel.onEvent(UIEventHome.OnAskForDoorsStateChanged(it))
                     },
                 )
 
@@ -301,7 +299,7 @@ fun HomeScreen(
                     .align(Alignment.BottomCenter)
                     .padding(10.dp),
                 showIcon = true,
-                icon = R.drawable.ic_check_circle
+                icon = R.drawable.ic_check_green
             )
         }
     }

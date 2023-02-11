@@ -1,4 +1,4 @@
-package com.example.jetpackcomposeapp.data.local
+package com.example.jetpackcomposeapp.data.repo.home
 
 
 import androidx.datastore.core.DataStore

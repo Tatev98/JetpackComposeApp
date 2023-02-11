@@ -10,19 +10,21 @@ object DateUtil {
     private const val MONTH = (30 * DAY)
     private const val YEAR = (365 * DAY)
 
+
+    //return time by interval
     fun getIntervalAgoSinceNow(interval: Long): String {
         when {
             interval < 1 * MINUTE -> {
                 return "just now"
             }
             interval < 2 * MINUTE -> {
-                return " a minute ago"
+                return " 1 minute ago"
             }
             interval <= 45 * MINUTE -> {
                 return (interval / MINUTE).toString() + " minutes ago"
             }
             interval <= 90 * MINUTE -> {
-                return "an hour ago"
+                return "1 hour ago"
             }
             interval < 3 * HOUR -> {
                 return "2 hours ago"
@@ -31,7 +33,7 @@ object DateUtil {
                 return (interval / HOUR).toString() + " hours ago"
             }
             interval < 36 * HOUR -> {
-                return "a day ago"
+                return "1 day ago"
             }
             interval < 72 * HOUR -> {
                 return "2 days ago"
@@ -40,9 +42,9 @@ object DateUtil {
                 return (interval / DAY).toString() + " days ago"
             }
             interval < 11 * DAY -> {
-                return "a week ago"
+                return "1 week ago"
             }
-            interval < 14 * DAY -> {
+            interval < 1 * DAY -> {
                 return "2 weeks ago"
             }
             interval < 9 * WEEK -> {
@@ -52,7 +54,7 @@ object DateUtil {
                 return (interval / MONTH).toString() + " months ago"
             }
             interval < 2 * YEAR -> {
-                return "a year ago"
+                return "1 year ago"
             }
             else -> {
                 return (interval / YEAR).toString() + " years ago"

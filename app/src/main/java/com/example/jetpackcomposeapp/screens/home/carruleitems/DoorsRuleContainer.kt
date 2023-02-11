@@ -1,9 +1,8 @@
-package com.example.jetpackcomposeapp.screens.carruleitems
+package com.example.jetpackcomposeapp.screens.home.carruleitems
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -17,12 +16,17 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.jetpackcomposeapp.R
+import com.example.jetpackcomposeapp.ui.theme.lightGray
 
 
-//Container for Controlling Engine state items
+//Container for Doors State Controlling items
 @Composable
-fun EngineRuleContainer(
-    modifier: Modifier
+fun DoorsRuleContainer(
+    modifier: Modifier,
+    isClickedLock: Boolean, // if clicked lock button
+    isLoading: Boolean, // if loading is showing
+    isDoorsLocked: Boolean, // if doors are in locked state
+    onClick: (Boolean) -> Unit,
 ) {
     ConstraintLayout(
         modifier = modifier
@@ -30,6 +34,10 @@ fun EngineRuleContainer(
         val (
             titleRow, buttonsBackgroundBox, firstButton, secondButton
         ) = createRefs()
+        val stateText =
+            if (isLoading) stringResource(R.string.dots) else if (isDoorsLocked) stringResource(R.string.locked) else stringResource(
+                R.string.unlocked
+            )
         val guildLineFromStart1 = createGuidelineFromStart(0.08f)
         val guildLineFromStart2 = createGuidelineFromStart(0.495f)
         val guildLineFromStart3 = createGuidelineFromStart(0.505f)
@@ -45,7 +53,7 @@ fun EngineRuleContainer(
                 .padding(bottom = 5.dp)
         ) {
             Text(
-                text = stringResource(R.string.engine),
+                text = stringResource(R.string.doors),
                 style = MaterialTheme.typography.h4.merge(),
                 color = Color.Black,
                 modifier = Modifier
@@ -53,7 +61,24 @@ fun EngineRuleContainer(
                     .padding(end = 10.dp),
                 textAlign = TextAlign.Start,
             )
+            Divider(
+                color = Color.LightGray,
+                modifier = Modifier
+                    .height(20.dp)
+                    .align(Alignment.CenterVertically)
+                    .width(2.dp)
+            )
+            Text(
+                text = stateText,
+                style = MaterialTheme.typography.h5.merge(),
+                color = lightGray,
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(start = 10.dp),
+                textAlign = TextAlign.Start,
+            )
         }
+
         Box(
             modifier = Modifier
                 .constrainAs(buttonsBackgroundBox) {
@@ -66,8 +91,13 @@ fun EngineRuleContainer(
                 }
                 .background(Color.White, RectangleShape)) {}
 
-        EngineRuleItem(
-            stringResource(R.string.start),
+
+        DoorsRuleItem(
+            isLockingButton = true,
+            isLoading = isLoading && isClickedLock,
+            isEnabled = isLoading && !isClickedLock,
+            isCurrentState = isDoorsLocked,
+            isClickable = !isLoading,
             modifier = Modifier
                 .constrainAs(firstButton) {
                     top.linkTo(titleRow.bottom)
@@ -76,10 +106,15 @@ fun EngineRuleContainer(
                     end.linkTo(guildLineFromStart2)
                     width = Dimension.wrapContent
                     height = Dimension.wrapContent
-                }
+                },
+            onClick = onClick,
         )
-        EngineRuleItem(
-            stringResource(R.string.stop),
+        DoorsRuleItem(
+            isLockingButton = false,
+            isLoading = isLoading && !isClickedLock,
+            isEnabled = isLoading && isClickedLock,
+            isCurrentState = !isDoorsLocked,
+            isClickable = !isLoading,
             modifier = Modifier
                 .constrainAs(secondButton) {
                     top.linkTo(titleRow.bottom)
@@ -88,7 +123,8 @@ fun EngineRuleContainer(
                     end.linkTo(guildLineFromStart4)
                     width = Dimension.wrapContent
                     height = Dimension.wrapContent
-                }
+                },
+            onClick = onClick,
         )
 
     }

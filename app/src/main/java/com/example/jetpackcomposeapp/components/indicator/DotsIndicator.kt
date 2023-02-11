@@ -1,4 +1,4 @@
-package com.example.jetpackcomposeapp.screens.indicator
+package com.example.jetpackcomposeapp.components.indicator
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
